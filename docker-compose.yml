@@ -65,6 +65,15 @@ services:
     networks:
       - app-network
 
+    # 6. NEW SERVICE: Cloudflare Tunnel
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: url-tunnel
+    restart: unless-stopped
+    command: tunnel run --token eyJhIjoiMGYzZmI1ZDY0MDZjNzg0OTJhM2M5OTRhNjNhNDExMzAiLCJ0IjoiOTQxYjI4NTktZmE3Ni00MjE3LTllZTMtMTNkZWQxMDRjNzUxIiwicyI6IlpqQmhZMkUyWm1NdFl6Y3hZaTAwTlRZd0xUa3pOamN0WkdReE5XTXhOekU1WkRaaiJ9
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge
