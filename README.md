@@ -21,7 +21,7 @@ A high-performance URL shortener built with an event-driven microservices archit
 
 1.  **Clone the repo**
     ```bash
-    git clone [https://github.com/SSRINIBASS/urlite.git](https://github.com/SSRINIBASS/urlite.git)
+    git clone https://github.com/SSRINIBASS/urlite.git
     cd urlite
     ```
 
