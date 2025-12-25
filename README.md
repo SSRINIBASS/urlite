@@ -21,8 +21,8 @@ A high-performance URL shortener built with an event-driven microservices archit
 
 1.  **Clone the repo**
     ```bash
-    git clone [https://github.com/yourusername/microservices-url-shortener.git](https://github.com/yourusername/microservices-url-shortener.git)
-    cd microservices-url-shortener
+    git clone [https://github.com/SSRINIBASS/urlite.git](https://github.com/SSRINIBASS/urlite.git)
+    cd urlite
     ```
 
 2.  **Setup Environment**
@@ -36,5 +36,8 @@ A high-performance URL shortener built with an event-driven microservices archit
     docker-compose up -d --build
     ```
 
-4.  **Visit App**
+4.  **Visit Your App**
+    Open `http://localhost:8080/`
+
+5.  **Visit MyApp**
     Open `https://shortener.dsrinibas.space/`
