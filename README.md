@@ -80,7 +80,3 @@ docker-compose.yml
 ## Current scope
 
 URLite demonstrates service decomposition, cache-backed reads, background work, relational persistence and containerised local deployment. It is a compact engineering project, not a claim of production-scale capacity or delivery guarantees.
-
-## License
-
-See [LICENSE](LICENSE) if present in the repository.
