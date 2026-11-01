@@ -1,40 +1,41 @@
 const { Pool } = require('pg');
 const { createClient } = require('redis');
 
-// 1. Setup Postgres Connection
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL || 'postgres://user:password@db:5432/myapp',
 });
 
-// 2. Setup Redis Connection
 const redisClient = createClient({
-  url: 'redis://redis:6379'
+  url: process.env.REDIS_URL || 'redis://redis:6379',
+});
+
+redisClient.on('error', (err) => {
+  console.error('Redis client error:', err);
 });
 
 async function processQueue() {
   await redisClient.connect();
-  console.log('👷 Worker connected to Redis & DB. Waiting for work...');
+  console.log('Worker connected to Redis and PostgreSQL; waiting for click events...');
 
   while (true) {
     try {
-      // "brPop" = Blocking Right Pop. It waits here forever until an item arrives.
-      // We listen to the 'clicks' queue.
       const result = await redisClient.brPop('clicks', 0);
-      
-      // result looks like: { key: 'clicks', element: 'shortCode123' }
-      const shortCode = result.element;
-      
-      console.log(`🔨 Processing click for: ${shortCode}`);
+      if (!result?.element) continue;
 
-      // Update the DB
-      await pool.query('UPDATE urls SET clicks = clicks + 1 WHERE short_code = $1', [shortCode]);
-      
+      const shortCode = result.element;
+      await pool.query(
+        'UPDATE urls SET clicks = clicks + 1 WHERE short_code = $1',
+        [shortCode],
+      );
+      console.log(`Processed click for ${shortCode}`);
     } catch (err) {
-      console.error("Worker Error:", err);
-      // Wait 5 seconds before restarting loop if connection fails
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      console.error('Worker error:', err);
+      await new Promise((resolve) => setTimeout(resolve, 5000));
     }
   }
 }
 
-processQueue();
+processQueue().catch((err) => {
+  console.error('Worker failed to start:', err);
+  process.exit(1);
+});
