@@ -1,43 +1,42 @@
-version: '3.8'
-
 services:
-  # 1. Database
   db:
     image: postgres:15-alpine
     container_name: url-db
+    restart: unless-stopped
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER:-urlite}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-urlite}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./Database/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
       - app-network
 
-  # 2. Backend API
   backend:
     build: ./server
     container_name: url-backend
+    restart: unless-stopped
     depends_on:
       - db
+      - redis
     environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - REDIS_URL=${REDIS_URL}
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL in .env}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
     networks:
       - app-network
 
-  # 3. Frontend UI
   frontend:
     build: ./client
     container_name: url-frontend
+    restart: unless-stopped
     networks:
       - app-network
 
-  # 4. Nginx Proxy (Entry Point)
   nginx:
     build: ./nginx
     container_name: url-nginx
+    restart: unless-stopped
     ports:
       - "8080:80"
     depends_on:
@@ -46,31 +45,35 @@ services:
     networks:
       - app-network
 
-  # 5. NEW SERVICE: Redis (In-Memory Cache)
   redis:
-    image: redis:alpine
+    image: redis:7-alpine
     container_name: url-redis
+    restart: unless-stopped
     networks:
       - app-network
 
   worker:
     build: ./worker
     container_name: url-worker
+    restart: unless-stopped
     depends_on:
       - redis
       - db
     environment:
-      - DATABASE_URL=${DATABASE_URL}
-      - REDIS_URL=${REDIS_URL}
+      DATABASE_URL: ${DATABASE_URL:?Set DATABASE_URL in .env}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
     networks:
       - app-network
 
-    # 6. NEW SERVICE: Cloudflare Tunnel
+  # Optional: enable with docker compose --profile tunnel up -d.
+  # Keep the tunnel token in the local .env file; never commit it.
   tunnel:
     image: cloudflare/cloudflared:latest
     container_name: url-tunnel
+    profiles:
+      - tunnel
     restart: unless-stopped
-    command: tunnel run --token eyJhIjoiMGYzZmI1ZDY0MDZjNzg0OTJhM2M5OTRhNjNhNDExMzAiLCJ0IjoiOTQxYjI4NTktZmE3Ni00MjE3LTllZTMtMTNkZWQxMDRjNzUxIiwicyI6IlpqQmhZMkUyWm1NdFl6Y3hZaTAwTlRZd0xUa3pOamN0WkdReE5XTXhOekU1WkRaaiJ9
+    command: tunnel run --token ${TUNNEL_TOKEN:-}
     networks:
       - app-network
 
