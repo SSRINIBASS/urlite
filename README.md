@@ -1,3 +1,9 @@
+<div align="center">
+
+<img src="assets/portfolio-preview.svg" width="100%" alt="URLite service-oriented URL shortener architecture"/>
+
+</div>
+
 # URLite
 
 <p>
