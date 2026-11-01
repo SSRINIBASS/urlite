@@ -1,8 +1,19 @@
 # URLite
 
+<p>
+  <img src="https://img.shields.io/badge/Architecture-Service--oriented-2563EB?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Cache-Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Database-PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Deployment-Docker%20Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white"/>
+</p>
+
+<p>
+  <a href="https://skillicons.dev"><img src="https://skillicons.dev/icons?i=nodejs,express,react,postgres,redis,nginx,docker,cloudflare&perline=8" alt="URLite technology stack"/></a>
+</p>
+
 A service-oriented URL shortener built around a small, understandable backend stack: Express, PostgreSQL, Redis, a separate analytics worker, and an Nginx entry point.
 
-## Architecture
+## 🧩 Architecture
 
 ```mermaid
 flowchart LR
@@ -26,7 +37,7 @@ flowchart LR
 | Cache / queue | Redirect lookup cache and click-event handoff | Redis |
 | Worker | Applies click-count updates outside the redirect handler | Node.js |
 
-## Engineering notes
+## ⚙️ Engineering notes
 
 - Redirect lookups use Redis as a cache in front of PostgreSQL.
 - Cached URLs have a one-hour TTL.
@@ -34,7 +45,7 @@ flowchart LR
 - The current Redis-list worker is intentionally simple; it is not a durable message-processing system. A production deployment would need explicit retry, idempotency and dead-letter handling.
 - Cloudflare Tunnel support is optional and enabled through a Compose profile. Its token is supplied through an environment variable, never committed as configuration.
 
-## Run locally
+## 🚀 Run locally
 
 ### Prerequisites
 
@@ -65,7 +76,7 @@ To enable the optional Cloudflare Tunnel, set `TUNNEL_TOKEN` in your local `.env
 docker compose --profile tunnel up --build -d
 ```
 
-## Repository layout
+## 📁 Repository layout
 
 ```text
 client/       React application
@@ -77,6 +88,6 @@ docker-compose.yml
 .env.example
 ```
 
-## Current scope
+## 🎯 Current scope
 
 URLite demonstrates service decomposition, cache-backed reads, background work, relational persistence and containerised local deployment. It is a compact engineering project, not a claim of production-scale capacity or delivery guarantees.
